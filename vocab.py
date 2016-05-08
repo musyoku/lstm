@@ -15,6 +15,7 @@ def load(dir):
 		unko = codecs.open("%s/%s" % (dir, fn), "r", "utf_8_sig")	# BOMありならutf_8_sig　そうでないならutf_8
 		for line in unko:
 			line = line.replace("\n", "")
+			line = line.replace("\r", "")
 			data = np.empty((len(line) + 1,), dtype=np.int32)
 			for i in xrange(len(line)):
 				word = line[i]
