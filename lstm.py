@@ -210,7 +210,10 @@ class LSTM:
 				ids = [np.random.choice(np.arange(output.data.shape[1]), p=output.data[0])]
 		elif self.output_type == self.OUTPUT_TYPE_EMBED_VECTOR:
 			output = self(c0, test=test, softmax=False)
-			ids = self.embed_id.reverse(output.data, to_cpu=True)
+			if argmax:
+				ids = self.embed_id.reverse(output.data, to_cpu=True, sample=False)
+			else:
+				ids = self.embed_id.reverse(output.data, to_cpu=True, sample=True)
 		return ids[0]
 
 	def distribution(self, word, test=True):
