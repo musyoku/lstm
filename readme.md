@@ -21,7 +21,6 @@ train_text内に`text`フォルダを作成し、その中に文章データの`
 - lstm_apply_batchnorm
 	- [Recurrent Batch Normalization](http://arxiv.org/abs/1603.09025)を有効にします
 	- 通常のLSTMに比べて学習速度は半分ほどに落ちますが、時間あたりの収束の速さは通常版を上回ります
-	- デフォルトで有効です
 - fc_output_type
 	- LSTM出力を単語へ変換する全結合層の種類を指定します
 	- 1か2のどちらかを指定します

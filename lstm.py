@@ -42,13 +42,13 @@ class Conf:
 		
 		self.fc_apply_batchnorm = False
 		self.fc_apply_dropout = False
-		self.fc_activation_function = "tanh"
+		self.fc_activation_function = "elu"
 
 		# "embed_vector": outputs an embed vector. Instead of softmax layer, We use EmbedID.reverse() to convert vector to label id.
 		# "softmax": outputs a probability distribution of label ids using softmax layer
 		self.fc_output_type = LSTM.OUTPUT_TYPE_SOFTMAX
 
-		self.learning_rate = 0.0025
+		self.learning_rate = 0.001
 		self.gradient_momentum = 0.95
 
 	def check(self):
@@ -68,7 +68,11 @@ class LSTMNetwork(chainer.Chain):
 
 		# Hidden layers
 		for i in range(self.n_layers):
-			u = getattr(self, "layer_%i" % i)(chain[-1])
+			net = getattr(self, "layer_%i" % i)
+			if net is BNLSTM:
+				u = net(chain[-1], test=test)
+			else:
+				u = net(chain[-1])
 			output = u
 			if self.apply_dropout:
 				output = F.dropout(output, train=not test)
@@ -96,7 +100,7 @@ class FullyConnectedNetwork(chainer.Chain):
 		chain = [x]
 
 		# Hidden layers
-		for i in range(self.n_layers):
+		for i in range(self.n_layers - 1):
 			u = chain[-1]
 			if self.apply_batchnorm:
 				u = getattr(self, "batchnorm_%i" % i)(u, test=test)
@@ -105,6 +109,14 @@ class FullyConnectedNetwork(chainer.Chain):
 			if self.apply_dropout and i != self.n_layers - 1:
 				output = F.dropout(output, train=not test)
 			chain.append(output)
+
+		# We do not apply activation function to the output layer
+		u = chain[-1]
+		if self.apply_batchnorm:
+			u = getattr(self, "batchnorm_%i" % (self.n_layers - 1))(u, test=test)
+		u = getattr(self, "layer_%i" % (self.n_layers - 1))(u)
+		output = u
+		chain.append(output)
 
 		return chain[-1]
 
@@ -192,7 +204,9 @@ class LSTM:
 
 	@property
 	def gpu(self):
-		return True if self.xp is cuda.cupy else False
+		if hasattr(cuda, "cupy"):
+			return True if self.xp is cuda.cupy else False
+		return False
 
 	def reset_state(self):
 		self.lstm.reset_state()
@@ -202,7 +216,7 @@ class LSTM:
 		c0 = Variable(xp.asarray([word], dtype=np.int32))
 		if self.output_type == self.OUTPUT_TYPE_SOFTMAX:
 			output = self(c0, test=test, softmax=True)
-			if xp is cuda.cupy:
+			if hasattr(cuda, "cupy") and xp is cuda.cupy:
 				output.to_cpu()
 			if argmax:
 				ids = np.argmax(output.data, axis=1)

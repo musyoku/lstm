@@ -10,7 +10,7 @@ from env import dataset, n_vocab, n_dataset, lstm, conf
 sys.stdout = codecs.getwriter(sys.stdout.encoding)(sys.stdout, errors="xmlcharrefreplace")
 
 # 学習時に長さ制限した場合は同じ値をここにもセット
-current_length_limit = 15
+current_length_limit = 100
 
 def get_validation_data():
 	max_length_in_batch = 0

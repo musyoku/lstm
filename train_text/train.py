@@ -7,7 +7,7 @@ from env import dataset, n_vocab, n_dataset, lstm, conf
 
 n_epoch = 1000
 n_train = 1000
-batchsize = 64
+batchsize = 32
 total_time = 0
 
 # 長すぎるデータはメモリに乗らないこともあります
@@ -15,7 +15,7 @@ max_length_of_chars = 100
 
 # 学習初期は短い文章のみ学習し、徐々に長くしていきます。
 # この機能が必要ない場合は最初から大きな値を設定します。
-current_length_limit = 15
+current_length_limit = 70
 increasing_limit_interval = 1000
 
 def make_batch():
@@ -68,10 +68,11 @@ for epoch in xrange(n_epoch):
 	for i in xrange(num_validation):
 		lstm.reset_state()
 		phrase = get_validation_data()
-		for n in xrange(len(phrase)):
-			char = phrase[n]
-			dist = lstm.predict(char, test=True)
-			if char == dist:
+		for n in xrange(len(phrase) - 1):
+			input = phrase[n]
+			target = phrase[n + 1]
+			dist = lstm.predict(input, test=True)
+			if target == dist:
 				correct += 1
-	print "validation: {:.3f}".format(correct / float(num_validation) / float(len(phrase)))
+	print "validation: {:.3f}".format(correct / float(num_validation) / float(len(phrase) - 1))
 
