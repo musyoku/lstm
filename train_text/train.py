@@ -6,7 +6,7 @@ from args import args
 from env import dataset, n_vocab, n_dataset, lstm, conf
 
 n_epoch = 1000
-n_train = 1000
+n_train = 200
 batchsize = 32
 total_time = 0
 
@@ -65,6 +65,7 @@ for epoch in xrange(n_epoch):
 	# Validation
 	num_validation = 500
 	correct = 0
+	total_count = 0
 	for i in xrange(num_validation):
 		lstm.reset_state()
 		phrase = get_validation_data()
@@ -72,7 +73,8 @@ for epoch in xrange(n_epoch):
 			input = phrase[n]
 			target = phrase[n + 1]
 			dist = lstm.predict(input, test=True)
+			total_count += 1
 			if target == dist:
 				correct += 1
-	print "validation: {:.3f}".format(correct / float(num_validation) / float(len(phrase) - 1))
+	print "validation: {:.3f}".format(correct / float(total_count))
 
