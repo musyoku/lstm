@@ -69,7 +69,7 @@ class LSTMNetwork(chainer.Chain):
 		# Hidden layers
 		for i in range(self.n_layers):
 			net = getattr(self, "layer_%i" % i)
-			if net is BNLSTM:
+			if isinstance(net, BNLSTM):
 				u = net(chain[-1], test=test)
 			else:
 				u = net(chain[-1])

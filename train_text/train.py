@@ -63,7 +63,7 @@ for epoch in xrange(n_epoch):
 		current_length_limit = (current_length_limit + 5) if current_length_limit < max_length_of_chars else max_length_of_chars
 
 	# Validation
-	num_validation = 500
+	num_validation = 100
 	correct = 0
 	total_count = 0
 	for i in xrange(num_validation):
