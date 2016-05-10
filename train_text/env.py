@@ -15,6 +15,7 @@ conf.fc_output_type = args.fc_output_type
 conf.fc_hidden_units = []
 conf.fc_apply_batchnorm = True
 conf.fc_apply_dropout = True
+conf.learning_rate = args.learning_rate
 print "lstm_apply_batchnorm:", conf.lstm_apply_batchnorm
 lstm = LSTM(conf, name="lstm")
 lstm.load(args.model_dir)

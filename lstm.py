@@ -49,7 +49,7 @@ class Conf:
 		# "softmax": outputs a probability distribution of label ids using softmax layer
 		self.fc_output_type = LSTM.OUTPUT_TYPE_SOFTMAX
 
-		self.learning_rate = 0.0002
+		self.learning_rate = 0.001
 		self.gradient_momentum = 0.95
 
 	def check(self):
