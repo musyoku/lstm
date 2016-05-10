@@ -10,12 +10,11 @@ conf = Conf()
 conf.use_gpu = True if args.use_gpu == 1 else False
 conf.n_vocab = n_vocab
 conf.lstm_apply_batchnorm = True if args.lstm_apply_batchnorm == 1 else False
-conf.lstm_hidden_units = [1000]
+conf.lstm_hidden_units = [300]
 conf.fc_output_type = args.fc_output_type
-conf.fc_hidden_units = [600, 600]
+conf.fc_hidden_units = []
 conf.fc_apply_batchnorm = True
 conf.fc_apply_dropout = True
 print "lstm_apply_batchnorm:", conf.lstm_apply_batchnorm
-print "fc_output_type:", conf.fc_output_type
 lstm = LSTM(conf, name="lstm")
 lstm.load(args.model_dir)

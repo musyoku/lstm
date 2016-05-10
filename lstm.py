@@ -38,6 +38,7 @@ class Conf:
 
 		# Fully-connected network that converts an output of the LSTM to a label distribution or an embed vector
 		# We don't contain input and output unit size here.
+		# If you don't want to use fully-connected network, set fc_hidden_units to []
 		self.fc_hidden_units = [500]
 		
 		self.fc_apply_batchnorm = False
@@ -48,14 +49,12 @@ class Conf:
 		# "softmax": outputs a probability distribution of label ids using softmax layer
 		self.fc_output_type = LSTM.OUTPUT_TYPE_SOFTMAX
 
-		self.learning_rate = 0.001
+		self.learning_rate = 0.0002
 		self.gradient_momentum = 0.95
 
 	def check(self):
 		if len(self.lstm_hidden_units) < 1:
 			raise Exception("You need to add one or more hidden layers to LSTM network.")
-		if len(self.fc_hidden_units) < 1:
-			raise Exception("You need to add one or more hidden layers to fully-connected network.")
 
 class LSTMNetwork(chainer.Chain):
 	def __init__(self, **layers):
@@ -167,14 +166,22 @@ class LSTM:
 			lstm.to_gpu()
 
 		fc_attributes = {}
-		fc_units = [(conf.lstm_hidden_units[-1], conf.fc_hidden_units[0])]
-		fc_units += zip(conf.fc_hidden_units[:-1], conf.fc_hidden_units[1:])
-		if conf.fc_output_type == self.OUTPUT_TYPE_EMBED_VECTOR:
-			fc_units += [(conf.fc_hidden_units[-1], conf.embed_size)]
-		elif conf.fc_output_type == self.OUTPUT_TYPE_SOFTMAX:
-			fc_units += [(conf.fc_hidden_units[-1], conf.n_vocab)]
+		if len(conf.fc_hidden_units) == 0:
+			if conf.fc_output_type == self.OUTPUT_TYPE_EMBED_VECTOR:
+				fc_units = [(conf.lstm_hidden_units[-1], conf.embed_size)]
+			elif conf.fc_output_type == self.OUTPUT_TYPE_SOFTMAX:
+				fc_units = [(conf.lstm_hidden_units[-1], conf.n_vocab)]
+			else:
+				raise Exception()
 		else:
-			raise Exception()
+			fc_units = [(conf.lstm_hidden_units[-1], conf.fc_hidden_units[0])]
+			fc_units += zip(conf.fc_hidden_units[:-1], conf.fc_hidden_units[1:])
+			if conf.fc_output_type == self.OUTPUT_TYPE_EMBED_VECTOR:
+				fc_units += [(conf.fc_hidden_units[-1], conf.embed_size)]
+			elif conf.fc_output_type == self.OUTPUT_TYPE_SOFTMAX:
+				fc_units += [(conf.fc_hidden_units[-1], conf.n_vocab)]
+			else:
+				raise Exception()
 
 		for i, (n_in, n_out) in enumerate(fc_units):
 			fc_attributes["layer_%i" % i] = L.Linear(n_in, n_out, wscale=wscale)
