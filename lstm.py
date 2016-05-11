@@ -73,7 +73,7 @@ class LSTMNetwork(chainer.Chain):
 			else:
 				u = net(chain[-1])
 			output = u
-			if self.apply_dropout:
+			if i != self.n_layers - 1 and self.apply_dropout:
 				output = F.dropout(output, train=not test)
 			chain.append(output)
 
