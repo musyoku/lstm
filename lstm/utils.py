@@ -13,3 +13,7 @@ def onehot(labels, ndim=10):
 	vec = np.zeros((len(labels), ndim), dtype=np.float32)
 	vec[np.arange(len(labels)), labels] = 1
 	return vec
+
+
+
+# asda
